@@ -13,6 +13,8 @@ namespace WoodworkBerserk
         Texture2D ballTexture;
         Vector2 ballPosition;
         float ballSpeed;
+        Controllers.IWBKeyboardInputHandler kinput;
+        Models.IWBSettings settingstest;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -21,6 +23,23 @@ namespace WoodworkBerserk
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+        }
+
+        public void BallUp(float elapsedTimeInSeconds)
+        {
+            ballPosition.Y -= ballSpeed * elapsedTimeInSeconds;
+        }
+        public void BallDown(float elapsedTimeInSeconds)
+        {
+            ballPosition.Y += ballSpeed * elapsedTimeInSeconds;
+        }
+        public void BallLeft(float elapsedTimeInSeconds)
+        {
+            ballPosition.X -= ballSpeed * elapsedTimeInSeconds;
+        }
+        public void BallRight(float elapsedTimeInSeconds)
+        {
+            ballPosition.X += ballSpeed * elapsedTimeInSeconds;
         }
 
         /// <summary>
@@ -36,6 +55,15 @@ namespace WoodworkBerserk
                 graphics.PreferredBackBufferHeight / 2);
             ballSpeed = 100f;
 
+            kinput = new Controllers.WBKeyboardInputHandler();
+            settingstest = new Models.WBDefaultSettings();
+            settingstest.SetupKeyboardInputHandler(kinput);
+            // Would like WBDefaultSettings to do this but I'm not sure where make delegates.
+            settingstest.TestingAddAction(Keys.Up, BallUp);
+            settingstest.TestingAddAction(Keys.Down, BallDown);
+            settingstest.TestingAddAction(Keys.Left, BallLeft);
+            settingstest.TestingAddAction(Keys.Right, BallRight);
+           
             base.Initialize();
         }
 
@@ -73,18 +101,7 @@ namespace WoodworkBerserk
 
             // TODO: Add your update logic here
             var kstate = Keyboard.GetState();
-
-            if (kstate.IsKeyDown(Keys.Up))
-                ballPosition.Y -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (kstate.IsKeyDown(Keys.Down))
-                ballPosition.Y += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (kstate.IsKeyDown(Keys.Left))
-                ballPosition.X -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (kstate.IsKeyDown(Keys.Right))
-                ballPosition.X += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            kinput.HandleInput(kstate, (float)gameTime.ElapsedGameTime.TotalSeconds);
 
             ballPosition.X = Math.Min(Math.Max(ballTexture.Width / 2, ballPosition.X), graphics.PreferredBackBufferWidth - ballTexture.Width / 2);
             ballPosition.Y = Math.Min(Math.Max(ballTexture.Height / 2, ballPosition.Y), graphics.PreferredBackBufferHeight - ballTexture.Height / 2);
