@@ -15,6 +15,7 @@ namespace WoodworkBerserk
         float ballSpeed;
         Controllers.IWBKeyboardInputHandler kinput;
         Models.IWBSettings settingstest;
+        private GameMap map;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -23,23 +24,40 @@ namespace WoodworkBerserk
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
         }
 
-        public void BallUp(float elapsedTimeInSeconds)
+       // public void BallUp(float elapsedTimeInSeconds)
+       // {
+       //     ballPosition.Y -= ballSpeed * elapsedTimeInSeconds;
+       // }
+       // public void BallDown(float elapsedTimeInSeconds)
+       // {
+       //     ballPosition.Y += ballSpeed * elapsedTimeInSeconds;
+       // }
+       // public void BallLeft(float elapsedTimeInSeconds)
+       // {
+       //     ballPosition.X -= ballSpeed * elapsedTimeInSeconds;
+       // }
+       // public void BallRight(float elapsedTimeInSeconds)
+       // {
+       //     ballPosition.X += ballSpeed * elapsedTimeInSeconds;
+       // }
+        public void MoveUp(float elapsedTimeInSeconds)
         {
-            ballPosition.Y -= ballSpeed * elapsedTimeInSeconds;
+            map.Camera.Move(new Vector2(0, -1));
         }
-        public void BallDown(float elapsedTimeInSeconds)
+        public void MoveDown(float elapsedTimeInSeconds)
         {
-            ballPosition.Y += ballSpeed * elapsedTimeInSeconds;
+            map.Camera.Move(new Vector2(0, 1));
         }
-        public void BallLeft(float elapsedTimeInSeconds)
+        public void MoveRight(float elapsedTimeInSeconds)
         {
-            ballPosition.X -= ballSpeed * elapsedTimeInSeconds;
+            map.Camera.Move(new Vector2(1, 0));
         }
-        public void BallRight(float elapsedTimeInSeconds)
+        public void MoveLeft(float elapsedTimeInSeconds)
         {
-            ballPosition.X += ballSpeed * elapsedTimeInSeconds;
+            map.Camera.Move(new Vector2(-1, 0));
         }
 
         /// <summary>
@@ -53,17 +71,22 @@ namespace WoodworkBerserk
             // TODO: Add your initialization logic here
             ballPosition = new Vector2(graphics.PreferredBackBufferWidth / 2,
                 graphics.PreferredBackBufferHeight / 2);
-            ballSpeed = 100f;
-
+            //ballSpeed = 100f;
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            map = new GameMap(GraphicsDevice, Content, 32, 32, 100, 100);
             kinput = new Controllers.WBKeyboardInputHandler();
             settingstest = new Models.WBDefaultSettings();
             settingstest.SetupKeyboardInputHandler(kinput);
             // Would like WBDefaultSettings to do this but I'm not sure where make delegates.
-            settingstest.TestingAddAction(Keys.Up, BallUp);
-            settingstest.TestingAddAction(Keys.Down, BallDown);
-            settingstest.TestingAddAction(Keys.Left, BallLeft);
-            settingstest.TestingAddAction(Keys.Right, BallRight);
-           
+            //settingstest.TestingAddAction(Keys.Up, BallUp);
+            //settingstest.TestingAddAction(Keys.Down, BallDown);
+            //settingstest.TestingAddAction(Keys.Left, BallLeft);
+            //settingstest.TestingAddAction(Keys.Right, BallRight);
+            settingstest.TestingAddAction(Keys.Up, MoveUp);
+            settingstest.TestingAddAction(Keys.Down, MoveDown);
+            settingstest.TestingAddAction(Keys.Right, MoveRight);
+            settingstest.TestingAddAction(Keys.Left, MoveLeft);
+
             base.Initialize();
         }
 
@@ -73,8 +96,7 @@ namespace WoodworkBerserk
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            // Create a new SpriteBatch, which can be used to draw textures
 
             // TODO: use this.Content to load your game content here
             ballTexture = Content.Load<Texture2D>("ball");
@@ -116,9 +138,11 @@ namespace WoodworkBerserk
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.TransparentBlack);
 
             // TODO: Add your drawing code here
+            map.draw(spriteBatch);
+
             spriteBatch.Begin();
             spriteBatch.Draw(ballTexture, ballPosition, null, Color.White, 0f,
                 new Vector2(ballTexture.Width / 2, ballTexture.Height / 2),
