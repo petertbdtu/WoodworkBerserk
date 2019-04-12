@@ -12,18 +12,13 @@ namespace WoodworkBerserk
     /// </summary>
     public class Game1 : Game
     {
-        Texture2D ballTexture;
-        Vector2 ballPosition;
-        KeyboardState ks;
         //float ballSpeed;
         Controllers.IWBKeyboardInputHandler kinput;
-        Models.IWBSettings settingstest;
-        Models.WBDefaultSettings settings;
+        Models.IWBSettings settings;
         private GameMap map;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Animation animationDown, animationUp, animationLeft;
-        private int direction;
 
         public Game1()
         {
@@ -31,23 +26,7 @@ namespace WoodworkBerserk
             Content.RootDirectory = "Content";
 
         }
-
-       // public void BallUp(float elapsedTimeInSeconds)
-       // {
-       //     ballPosition.Y -= ballSpeed * elapsedTimeInSeconds;
-       // }
-       // public void BallDown(float elapsedTimeInSeconds)
-       // {
-       //     ballPosition.Y += ballSpeed * elapsedTimeInSeconds;
-       // }
-       // public void BallLeft(float elapsedTimeInSeconds)
-       // {
-       //     ballPosition.X -= ballSpeed * elapsedTimeInSeconds;
-       // }
-       // public void BallRight(float elapsedTimeInSeconds)
-       // {
-       //     ballPosition.X += ballSpeed * elapsedTimeInSeconds;
-       // }
+        
         public void MoveUp(float elapsedTimeInSeconds)
         {
             map.Camera.Move(new Vector2(0, -1));
@@ -76,15 +55,11 @@ namespace WoodworkBerserk
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            //ballPosition = new Vector2(graphics.PreferredBackBufferWidth / 2,
-            //    graphics.PreferredBackBufferHeight / 2);
-            //ballSpeed = 100f;
             spriteBatch = new SpriteBatch(GraphicsDevice);
             map = new GameMap(GraphicsDevice, Content, 32, 32, 100, 100);
             kinput = new Controllers.WBKeyboardInputHandler();
-            settingstest = new Models.WBDefaultSettings(this);
-            settingstest.SetupKeyboardInputHandler(kinput);
+            settings = new Models.WBDefaultSettings(this);
+            settings.SetupKeyboardInputHandler(kinput);
 
             base.Initialize();
         }
@@ -98,7 +73,6 @@ namespace WoodworkBerserk
             // Create a new SpriteBatch, which can be used to draw textures
 
             // TODO: use this.Content to load your game content here
-            //ballTexture = Content.Load<Texture2D>("ball");
             animationLeft = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 0);
             animationUp = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 16);
             animationDown = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 32);
@@ -144,7 +118,6 @@ namespace WoodworkBerserk
             animationDown.Update(gameTime);
             //ballPosition.X = Math.Min(Math.Max(ballTexture.Width / 2, ballPosition.X), graphics.PreferredBackBufferWidth - ballTexture.Width / 2);
             //ballPosition.Y = Math.Min(Math.Max(ballTexture.Height / 2, ballPosition.Y), graphics.PreferredBackBufferHeight - ballTexture.Height / 2);
-            settings = new Models.WBDefaultSettings();
             base.Update(gameTime);
         }
 
@@ -157,8 +130,16 @@ namespace WoodworkBerserk
             GraphicsDevice.Clear(Color.TransparentBlack);
 
             // TODO: Add your drawing code here
-            map.draw(spriteBatch);
-            int[][] terrain = new int[100][100];
+            int[,] terrain = new int[20,20];
+            for (int i = 0; i < 20*20; i++)
+            {
+                terrain[i / 20, i % 20] = 0;
+            }
+            Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
+            entities.Add(0,new Entity(new Vector2(5,5), 1, true));
+            State state = new State(0, terrain, entities);
+
+            map.Draw(spriteBatch, state);
             spriteBatch.Begin();
             animationLeft.loop = true;
             animationLeft.Draw(spriteBatch);

@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 
 namespace WoodworkBerserk.Models
 {
-    class Entity
+    public class Entity
     {
-        private Vector2 position;
-        private int tileTexture;
-        private Boolean collision;
+        public Vector2 position;
+        public int tileTexture;
+        public Boolean collision;
 
+        public Entity(Vector2 position, int tileTexture, bool collision)
+        {
+            this.position = position;
+            this.tileTexture = tileTexture;
+            this.collision = collision;
+        }
     }
 }

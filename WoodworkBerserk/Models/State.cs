@@ -8,21 +8,21 @@ using System.Threading.Tasks;
 
 namespace WoodworkBerserk.Models
 {
-    class State
+    public class State
     {
         public int mapWidth;
         public int mapHeight;
         public int mapID;
-        public int[][] terrain;
+        public int[,] terrain;
         public Dictionary<int, Entity> entities;
 
-        public State(int mapID, int[][] terrain, Dictionary<int, Entity> entities)
+        public State(int mapID, int[,] terrain, Dictionary<int, Entity> entities)
         {
             this.mapID = mapID;
             this.terrain = terrain;
             this.entities = entities;
-            this.mapHeight = terrain.Length;
-            this.mapWidth = terrain[0].Length;
+            this.mapHeight = terrain.GetLength(0);
+            this.mapWidth = terrain.GetLength(1);
         }
     }
 }
