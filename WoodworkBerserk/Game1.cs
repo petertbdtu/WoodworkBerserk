@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using WoodworkBerserk.Controllers;
 using WoodworkBerserk.Models;
 
 namespace WoodworkBerserk
@@ -10,11 +11,12 @@ namespace WoodworkBerserk
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class Game1 : Game, IActionHandler
     {
-        //float ballSpeed;
-        Controllers.IWBKeyboardInputHandler kinput;
-        Models.IWBSettings settings;
+        IGameServer gameServer;
+        State state;
+        Controllers.IKeyboardInputHandler kinput;
+        Models.ISettings settings;
         private GameMap map;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -27,24 +29,25 @@ namespace WoodworkBerserk
 
         }
         
-        public void MoveUp(float elapsedTimeInSeconds)
+        public void MoveUp()
         {
-            map.Camera.Move(new Vector2(0, -1));
-            animationUp.Draw(spriteBatch);
+            gameServer.Send(PlayerAction.MoveUp);
         }
-        public void MoveDown(float elapsedTimeInSeconds)
+        public void MoveDown()
         {
-            map.Camera.Move(new Vector2(0, 1));
-            animationDown.Draw(spriteBatch);
+            gameServer.Send(PlayerAction.MoveDown);
         }
-        public void MoveRight(float elapsedTimeInSeconds)
+        public void MoveRight()
         {
-            map.Camera.Move(new Vector2(1, 0));
+            gameServer.Send(PlayerAction.MoveRight);
         }
-        public void MoveLeft(float elapsedTimeInSeconds)
+        public void MoveLeft()
         {
-            map.Camera.Move(new Vector2(-1, 0));
-            animationLeft.Draw(spriteBatch);
+            gameServer.Send(PlayerAction.MoveLeft);
+        }
+        public void Interact()
+        {
+            gameServer.Send(PlayerAction.Interact);
         }
 
         /// <summary>
@@ -56,9 +59,12 @@ namespace WoodworkBerserk
         protected override void Initialize()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            gameServer = new LocalGameServer();
+            gameServer.Connect();
+            state = gameServer.Receive();
             map = new GameMap(GraphicsDevice, Content, 32, 32, 100, 100);
-            kinput = new Controllers.WBKeyboardInputHandler();
-            settings = new Models.WBDefaultSettings(this);
+            kinput = new KeyboardInputHandler();
+            settings = new DefaultSettings(this);
             settings.SetupKeyboardInputHandler(kinput);
 
             base.Initialize();
@@ -111,13 +117,22 @@ namespace WoodworkBerserk
                 Exit();
 
             // TODO: Add your update logic here
+
             var kstate = Keyboard.GetState();
-            kinput.HandleInput(kstate, (float)gameTime.ElapsedGameTime.TotalSeconds);
+            kinput.HandleInput(kstate);
+
+            /*
+             * HAVE TO SET UP CONNECTION ON STARTUP
+             * maintain connection?
+             * 
+             * Receive updated game state from server (incl. other user behavior)
+             *  May fail, will be received again later.
+             */
+            state = gameServer.Receive();
+
             animationLeft.Update(gameTime);
             animationUp.Update(gameTime);
             animationDown.Update(gameTime);
-            //ballPosition.X = Math.Min(Math.Max(ballTexture.Width / 2, ballPosition.X), graphics.PreferredBackBufferWidth - ballTexture.Width / 2);
-            //ballPosition.Y = Math.Min(Math.Max(ballTexture.Height / 2, ballPosition.Y), graphics.PreferredBackBufferHeight - ballTexture.Height / 2);
             base.Update(gameTime);
         }
 
@@ -130,15 +145,7 @@ namespace WoodworkBerserk
             GraphicsDevice.Clear(Color.TransparentBlack);
 
             // TODO: Add your drawing code here
-            int[,] terrain = new int[20,20];
-            for (int i = 0; i < 20*20; i++)
-            {
-                terrain[i / 20, i % 20] = 0;
-            }
-            Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
-            entities.Add(0,new Entity(new Vector2(5,5), 1, true));
-            State state = new State(0, terrain, entities);
-
+            
             map.Draw(spriteBatch, state);
             spriteBatch.Begin();
             animationLeft.loop = true;

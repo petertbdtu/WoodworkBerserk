@@ -3,8 +3,8 @@ using WoodworkBerserk.Controllers;
 
 namespace WoodworkBerserk.Models
 {
-    interface IWBSettings
+    interface ISettings
     {
-        void SetupKeyboardInputHandler(IWBKeyboardInputHandler kih);
+        void SetupKeyboardInputHandler(IKeyboardInputHandler kih);
     }
 }

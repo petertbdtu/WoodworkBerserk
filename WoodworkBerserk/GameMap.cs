@@ -61,8 +61,9 @@ public class GameMap
             foreach (Entity e in state.entities.Values)
             {
                 Texture2D graphic = textures[e.tileTexture];
+                Vector2 entityCenter = new Vector2(graphic.Width/2, graphic.Height/2);
                 Vector2 position = new Vector2(e.position.X * tileWidth, e.position.Y * tileHeight);
-                spriteBatch.Draw(graphic, position, null, Color.White, 0f, tileCenterPosition,
+                spriteBatch.Draw(graphic, position, null, Color.White, 0f, entityCenter,
                     Vector2.One, SpriteEffects.None, FOREGROUND);
             }
         }

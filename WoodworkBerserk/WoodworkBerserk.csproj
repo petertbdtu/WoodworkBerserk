@@ -43,17 +43,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controllers\AnimationController.cs" />
-    <Compile Include="Controllers\IWBKeyboardInputHandler.cs" />
-    <Compile Include="Controllers\WBKeyboardInputHandler.cs" />
+    <Compile Include="Controllers\IActionHandler.cs" />
+    <Compile Include="Controllers\LocalGameServer.cs" />
+    <Compile Include="Controllers\IKeyboardInputHandler.cs" />
+    <Compile Include="Controllers\KeyboardInputHandler.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameMap.cs" />
+    <Compile Include="Controllers\GameServer.cs" />
+    <Compile Include="Controllers\IGameServer.cs" />
     <Compile Include="Models\Animation.cs" />
     <Compile Include="Models\Entity.cs" />
     <Compile Include="Models\State.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Models\IWBSettings.cs" />
-    <Compile Include="Models\WBDefaultSettings.cs" />
+    <Compile Include="Models\ISettings.cs" />
+    <Compile Include="Models\DefaultSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Extended, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

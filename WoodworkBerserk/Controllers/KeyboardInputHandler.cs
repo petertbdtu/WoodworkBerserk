@@ -5,14 +5,14 @@ using WoodworkBerserk.Models;
 namespace WoodworkBerserk.Controllers
 {
 
-    public class WBKeyboardInputHandler : IWBKeyboardInputHandler
+    public class KeyboardInputHandler : IKeyboardInputHandler
     {
-        private Dictionary<Keys, WBInputDelegate> controls;
-        public WBKeyboardInputHandler()
+        private Dictionary<Keys, InputDelegate> controls;
+        public KeyboardInputHandler()
         {
-            controls = new Dictionary<Keys, WBInputDelegate>();
+            controls = new Dictionary<Keys, InputDelegate>();
         }
-        public void BindInputToAction(Keys input, WBInputDelegate action)
+        public void BindInputToAction(Keys input, InputDelegate action)
         {
             controls.Add(input, action);
         }
@@ -22,15 +22,15 @@ namespace WoodworkBerserk.Controllers
             controls.Remove(k);
         }
 
-        public void HandleInput(KeyboardState kstate, float elapsedTimeInSeconds)
+        public void HandleInput(KeyboardState kstate)
         {
             // Doesn't do key combinations.
             foreach(Keys k in kstate.GetPressedKeys())
             {
-                WBInputDelegate action;
+                InputDelegate action;
                 if (controls.TryGetValue(k, out action))
                 {
-                    action.Invoke(elapsedTimeInSeconds);
+                    action.Invoke();
                 }
             }
         }
