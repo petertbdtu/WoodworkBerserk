@@ -8,6 +8,7 @@ namespace WoodworkBerserk.Controllers
 {
     enum PlayerAction
     {
+        Nothing,
         MoveUp,
         MoveDown,
         MoveRight,
