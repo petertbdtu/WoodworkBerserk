@@ -5,15 +5,20 @@ namespace WoodworkBerserk.Models
 {
     class WBDefaultSettings : IWBSettings
     {
+        private Game1 game;
         private IWBKeyboardInputHandler kih;
+
+        public WBDefaultSettings(Game1 game)
+        {
+            this.game = game;
+        }
         public void SetupKeyboardInputHandler(IWBKeyboardInputHandler kih)
         {
             this.kih = kih;
-        }
-
-        public void TestingAddAction(Keys k, WBInputDelegate id)
-        {
-            kih.BindInputToAction(k, id);
+            kih.BindInputToAction(Keys.Up, game.MoveUp);
+            kih.BindInputToAction(Keys.Down, game.MoveDown);
+            kih.BindInputToAction(Keys.Right, game.MoveRight);
+            kih.BindInputToAction(Keys.Left, game.MoveLeft);
         }
     }
 }

@@ -75,17 +75,8 @@ namespace WoodworkBerserk
             spriteBatch = new SpriteBatch(GraphicsDevice);
             map = new GameMap(GraphicsDevice, Content, 32, 32, 100, 100);
             kinput = new Controllers.WBKeyboardInputHandler();
-            settingstest = new Models.WBDefaultSettings();
+            settingstest = new Models.WBDefaultSettings(this);
             settingstest.SetupKeyboardInputHandler(kinput);
-            // Would like WBDefaultSettings to do this but I'm not sure where make delegates.
-            //settingstest.TestingAddAction(Keys.Up, BallUp);
-            //settingstest.TestingAddAction(Keys.Down, BallDown);
-            //settingstest.TestingAddAction(Keys.Left, BallLeft);
-            //settingstest.TestingAddAction(Keys.Right, BallRight);
-            settingstest.TestingAddAction(Keys.Up, MoveUp);
-            settingstest.TestingAddAction(Keys.Down, MoveDown);
-            settingstest.TestingAddAction(Keys.Right, MoveRight);
-            settingstest.TestingAddAction(Keys.Left, MoveLeft);
 
             base.Initialize();
         }
