@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
+using WoodworkBerserk.Models;
 
 namespace WoodworkBerserk
 {
@@ -12,14 +14,17 @@ namespace WoodworkBerserk
     {
         Texture2D ballTexture;
         Vector2 ballPosition;
-        float ballSpeed;
+        KeyboardState ks;
+        //float ballSpeed;
         Controllers.IWBKeyboardInputHandler kinput;
         Models.IWBSettings settingstest;
+        Models.WBDefaultSettings settings;
         private GameMap map;
-
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        
+        Animation animationDown, animationUp, animationLeft;
+        private int direction;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -46,10 +51,12 @@ namespace WoodworkBerserk
         public void MoveUp(float elapsedTimeInSeconds)
         {
             map.Camera.Move(new Vector2(0, -1));
+            animationUp.Draw(spriteBatch);
         }
         public void MoveDown(float elapsedTimeInSeconds)
         {
             map.Camera.Move(new Vector2(0, 1));
+            animationDown.Draw(spriteBatch);
         }
         public void MoveRight(float elapsedTimeInSeconds)
         {
@@ -58,6 +65,7 @@ namespace WoodworkBerserk
         public void MoveLeft(float elapsedTimeInSeconds)
         {
             map.Camera.Move(new Vector2(-1, 0));
+            animationLeft.Draw(spriteBatch);
         }
 
         /// <summary>
@@ -69,8 +77,8 @@ namespace WoodworkBerserk
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            ballPosition = new Vector2(graphics.PreferredBackBufferWidth / 2,
-                graphics.PreferredBackBufferHeight / 2);
+            //ballPosition = new Vector2(graphics.PreferredBackBufferWidth / 2,
+            //    graphics.PreferredBackBufferHeight / 2);
             //ballSpeed = 100f;
             spriteBatch = new SpriteBatch(GraphicsDevice);
             map = new GameMap(GraphicsDevice, Content, 32, 32, 100, 100);
@@ -99,7 +107,18 @@ namespace WoodworkBerserk
             // Create a new SpriteBatch, which can be used to draw textures
 
             // TODO: use this.Content to load your game content here
-            ballTexture = Content.Load<Texture2D>("ball");
+            //ballTexture = Content.Load<Texture2D>("ball");
+            animationLeft = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 0);
+            animationUp = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 16);
+            animationDown = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 32);
+            animationLeft.updateTime = 1f / 5;
+            animationUp.updateTime = 1f / 5;
+            animationDown.updateTime = 1f / 5;
+            Vector2 position = new Vector2(graphics.PreferredBackBufferWidth / 2,
+                graphics.PreferredBackBufferHeight / 2);
+            animationLeft.position = position;
+            animationUp.position = position;
+            animationDown.position = position;
         }
 
         /// <summary>
@@ -109,6 +128,11 @@ namespace WoodworkBerserk
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+        }
+
+        public void Up(float elapsedTimeinSeconds)
+        {
+
         }
 
         /// <summary>
@@ -124,11 +148,12 @@ namespace WoodworkBerserk
             // TODO: Add your update logic here
             var kstate = Keyboard.GetState();
             kinput.HandleInput(kstate, (float)gameTime.ElapsedGameTime.TotalSeconds);
-
-            ballPosition.X = Math.Min(Math.Max(ballTexture.Width / 2, ballPosition.X), graphics.PreferredBackBufferWidth - ballTexture.Width / 2);
-            ballPosition.Y = Math.Min(Math.Max(ballTexture.Height / 2, ballPosition.Y), graphics.PreferredBackBufferHeight - ballTexture.Height / 2);
-
-
+            animationLeft.Update(gameTime);
+            animationUp.Update(gameTime);
+            animationDown.Update(gameTime);
+            //ballPosition.X = Math.Min(Math.Max(ballTexture.Width / 2, ballPosition.X), graphics.PreferredBackBufferWidth - ballTexture.Width / 2);
+            //ballPosition.Y = Math.Min(Math.Max(ballTexture.Height / 2, ballPosition.Y), graphics.PreferredBackBufferHeight - ballTexture.Height / 2);
+            settings = new Models.WBDefaultSettings();
             base.Update(gameTime);
         }
 
@@ -142,13 +167,14 @@ namespace WoodworkBerserk
 
             // TODO: Add your drawing code here
             map.draw(spriteBatch);
-
+            int[][] terrain = new int[100][100];
             spriteBatch.Begin();
-            spriteBatch.Draw(ballTexture, ballPosition, null, Color.White, 0f,
-                new Vector2(ballTexture.Width / 2, ballTexture.Height / 2),
-                Vector2.One, SpriteEffects.None, 0f );
+            animationLeft.loop = true;
+            animationLeft.Draw(spriteBatch);
+            //spriteBatch.Draw(ballTexture, ballPosition, null, Color.White, 0f,
+            //    new Vector2(ballTexture.Width / 2, ballTexture.Height / 2),
+            //    Vector2.One, SpriteEffects.None, 0f );
             spriteBatch.End();
-
             base.Draw(gameTime);
         }
     }

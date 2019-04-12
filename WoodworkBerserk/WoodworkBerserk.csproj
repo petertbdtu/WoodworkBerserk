@@ -42,10 +42,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Controllers\AnimationController.cs" />
     <Compile Include="Controllers\IWBKeyboardInputHandler.cs" />
     <Compile Include="Controllers\WBKeyboardInputHandler.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameMap.cs" />
+    <Compile Include="Models\Animation.cs" />
+    <Compile Include="Models\Entity.cs" />
+    <Compile Include="Models\State.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\IWBSettings.cs" />
