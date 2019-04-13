@@ -21,6 +21,7 @@ namespace WoodworkBerserk
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Animation animationDown, animationUp, animationLeft;
+        Texture2D character;
 
         public Game1()
         {
@@ -49,6 +50,11 @@ namespace WoodworkBerserk
         {
             gameServer.Send(PlayerAction.Interact);
         }
+        public void Shutdown()
+        {
+            gameServer.Disconnect();
+            Exit();
+        }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -60,7 +66,7 @@ namespace WoodworkBerserk
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             gameServer = new LocalGameServer();
-            gameServer.Connect();
+            gameServer.Connect(Content);
             state = gameServer.Receive();
             map = new GameMap(GraphicsDevice, Content, 32, 32, 100, 100);
             kinput = new KeyboardInputHandler();
@@ -79,17 +85,18 @@ namespace WoodworkBerserk
             // Create a new SpriteBatch, which can be used to draw textures
 
             // TODO: use this.Content to load your game content here
-            animationLeft = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 0);
-            animationUp = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 16);
-            animationDown = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 32);
-            animationLeft.updateTime = 1f / 5;
-            animationUp.updateTime = 1f / 5;
-            animationDown.updateTime = 1f / 5;
-            Vector2 position = new Vector2(graphics.PreferredBackBufferWidth / 2,
-                graphics.PreferredBackBufferHeight / 2);
-            animationLeft.position = position;
-            animationUp.position = position;
-            animationDown.position = position;
+            //animationLeft = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 0);
+            //animationUp = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 16);
+            //animationDown = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 32);
+            //animationLeft.updateTime = 1f / 5;
+            //animationUp.updateTime = 1f / 5;
+            //animationDown.updateTime = 1f / 5;
+            //Vector2 position = new Vector2(graphics.PreferredBackBufferWidth / 2,
+            //    graphics.PreferredBackBufferHeight / 2);
+            //animationLeft.position = position;
+            //animationUp.position = position;
+            //animationDown.position = position;
+            character = Content.Load<Texture2D>("characters");
         }
 
         /// <summary>
@@ -113,9 +120,6 @@ namespace WoodworkBerserk
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             // TODO: Add your update logic here
 
             var kstate = Keyboard.GetState();
@@ -130,9 +134,9 @@ namespace WoodworkBerserk
              */
             state = gameServer.Receive();
 
-            animationLeft.Update(gameTime);
-            animationUp.Update(gameTime);
-            animationDown.Update(gameTime);
+            //animationLeft.Update(gameTime);
+            //animationUp.Update(gameTime);
+            //animationDown.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -148,11 +152,13 @@ namespace WoodworkBerserk
             
             map.Draw(spriteBatch, state);
             spriteBatch.Begin();
-            animationLeft.loop = true;
-            animationLeft.Draw(spriteBatch);
+            //animationLeft.loop = false;
+            //animationLeft.Draw(spriteBatch);
             //spriteBatch.Draw(ballTexture, ballPosition, null, Color.White, 0f,
             //    new Vector2(ballTexture.Width / 2, ballTexture.Height / 2),
             //    Vector2.One, SpriteEffects.None, 0f );
+            spriteBatch.Draw(character, Vector2.Zero, null, new Rectangle(Point.Zero, new Point(16, 16)), null, 0f, null, Color.White, SpriteEffects.None, 0.1f);
+            
             spriteBatch.End();
             base.Draw(gameTime);
         }

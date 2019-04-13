@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Content;
+using System;
 using WoodworkBerserk.Controllers;
 using WoodworkBerserk.Models;
 
@@ -10,7 +11,12 @@ namespace WoodworkBerserk
         /**
          * Start thread which receives state from server & maintains
          */
-        public void Connect()
+        public void Connect(ContentManager content)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Disconnect()
         {
             throw new NotImplementedException();
         }

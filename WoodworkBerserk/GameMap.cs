@@ -46,6 +46,13 @@ public class GameMap
     public void Draw(SpriteBatch spriteBatch, State state)
     {
         Vector2 tilePos = Vector2.Zero;
+        Entity player;
+        if (state.entities.TryGetValue(state.playerId, out player))
+        {
+            camera.LookAt(player.position * tileHeight);
+        }
+        else
+            camera.LookAt(Vector2.Zero);
         spriteBatch.Begin(transformMatrix: camera.GetViewMatrix());
         for (int i = 0; i < state.mapWidth; i++)
         {
@@ -60,7 +67,7 @@ public class GameMap
             tilePos.X += tileWidth;
             foreach (Entity e in state.entities.Values)
             {
-                Texture2D graphic = textures[e.tileTexture];
+                Texture2D graphic = e.Texture;
                 Vector2 entityCenter = new Vector2(graphic.Width/2, graphic.Height/2);
                 Vector2 position = new Vector2(e.position.X * tileWidth, e.position.Y * tileHeight);
                 spriteBatch.Draw(graphic, position, null, Color.White, 0f, entityCenter,

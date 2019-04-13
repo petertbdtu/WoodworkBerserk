@@ -20,6 +20,7 @@ namespace WoodworkBerserk.Models
             kih.BindInputToAction(Keys.Right, ah.MoveRight);
             kih.BindInputToAction(Keys.Left, ah.MoveLeft);
             kih.BindInputToAction(Keys.Space, ah.Interact);
+            kih.BindInputToAction(Keys.Escape, ah.Shutdown);
         }
     }
 }

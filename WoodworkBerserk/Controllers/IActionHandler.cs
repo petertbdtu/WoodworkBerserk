@@ -23,5 +23,6 @@ namespace WoodworkBerserk.Controllers
         void MoveRight();
         void MoveLeft();
         void Interact();
+        void Shutdown();
     }
 }
