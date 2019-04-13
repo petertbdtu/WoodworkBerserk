@@ -11,11 +11,11 @@ namespace WoodworkBerserk.Models
     public class Entity
     {
         public Vector2 position;
-        public Texture2D Texture { get; set; }
-        public Entity(Vector2 position, Texture2D texture)
+        public int textureId;
+        public Entity(Vector2 position, int textureId)
         {
             this.position = position;
-            this.Texture = texture;
+            this.textureId = textureId;
         }
 
 

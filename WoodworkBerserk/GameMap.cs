@@ -13,9 +13,9 @@ public class GameMap
 
     private int tileWidth;
     private int tileHeight;
-    private int mapWidth;
-    private int mapHeight;
-    Texture2D[] textures;
+    Texture2D spriteSheet;
+    Rectangle[] spriteIndex;
+    Point spriteSize = new Point(16, 16);
 
     Vector2 tileCenterPosition;
 
@@ -30,17 +30,17 @@ public class GameMap
     }
    
 
-    public GameMap(GraphicsDevice graphics, ContentManager content, int tileWidth, int tileHeight, int mapWidth, int mapHeight)
+    public GameMap(GraphicsDevice graphics, ContentManager content, int tileWidth, int tileHeight)
     {
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
-        this.mapWidth = mapWidth;
-        this.mapHeight = mapHeight;
         camera = new Camera2D(graphics);
-        this.tileCenterPosition = new Vector2(tileWidth/2, tileHeight/2);
-        textures = new Texture2D[2];
-        textures[0] = content.Load<Texture2D>("grass-tile-2");
-        textures[1] = content.Load<Texture2D>("grass-tile-3");
+        this.tileCenterPosition = new Vector2(tileWidth / 2, tileHeight / 2);
+        spriteSheet = content.Load<Texture2D>("basictiles");
+        spriteIndex = new Rectangle[2];
+        spriteIndex[1] = new Rectangle(new Point(64 ,144), spriteSize);
+        spriteIndex[0] = new Rectangle(new Point(0, 128), spriteSize);
+        
     }
 
     public void Draw(SpriteBatch spriteBatch, State state)
@@ -56,10 +56,8 @@ public class GameMap
         spriteBatch.Begin(transformMatrix: camera.GetViewMatrix());
         for (int i = 0; i < state.mapWidth; i++)
         {
-            for (int j = 0; j < state.mapHeight; j++)
-            {
-                Texture2D tile = textures[state.terrain[i, j]];
-                spriteBatch.Draw(tile, new Vector2(tilePos.X,tilePos.Y), null, Color.White, 0f,
+            for (int j = 0; j < state.mapHeight; j++) {
+                spriteBatch.Draw(spriteSheet, new Vector2(tilePos.X,tilePos.Y), spriteIndex[state.terrain[i, j]], Color.White, 0f,
                     tileCenterPosition, Vector2.One, SpriteEffects.None, BACKGROUND);
                 tilePos.Y += tileHeight;
             }
@@ -67,10 +65,8 @@ public class GameMap
             tilePos.X += tileWidth;
             foreach (Entity e in state.entities.Values)
             {
-                Texture2D graphic = e.Texture;
-                Vector2 entityCenter = new Vector2(graphic.Width/2, graphic.Height/2);
                 Vector2 position = new Vector2(e.position.X * tileWidth, e.position.Y * tileHeight);
-                spriteBatch.Draw(graphic, position, null, Color.White, 0f, entityCenter,
+                spriteBatch.Draw(spriteSheet, position, spriteIndex[e.textureId], Color.White, 0f, tileCenterPosition,
                     Vector2.One, SpriteEffects.None, FOREGROUND);
             }
         }

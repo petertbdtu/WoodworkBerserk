@@ -29,7 +29,7 @@ namespace WoodworkBerserk
              * As practice it maintains playerId in a way which we expect
              * the actual OnlineGameServer connection to do.
              */
-            timer = new Timer(500);
+            timer = new Timer(333);
             timer.Elapsed += OnTick;
             timer.Start();
 
@@ -40,8 +40,8 @@ namespace WoodworkBerserk
                 terrain[i / 20, i % 20] = 0;
             }
             Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
-            texture = content.Load<Texture2D>("hero");
-            entities.Add(playerId, new Entity(new Vector2(5, 5), texture));
+            entities.Add(playerId, new Entity(new Vector2(5, 5), 1));
+            entities.Add(1, new Entity(new Vector2(1, 1), 1));
             state = new State(0, terrain, entities, playerId);
         }
 

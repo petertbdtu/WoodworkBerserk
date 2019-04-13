@@ -68,7 +68,7 @@ namespace WoodworkBerserk
             gameServer = new LocalGameServer();
             gameServer.Connect(Content);
             state = gameServer.Receive();
-            map = new GameMap(GraphicsDevice, Content, 32, 32, 100, 100);
+            map = new GameMap(GraphicsDevice, Content, 16, 16);
             kinput = new KeyboardInputHandler();
             settings = new DefaultSettings(this);
             settings.SetupKeyboardInputHandler(kinput);
