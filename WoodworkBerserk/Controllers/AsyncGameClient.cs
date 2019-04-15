@@ -107,16 +107,7 @@ namespace WoodworkBerserk
             byte[] msg = { 5, 250, 33, 9, 0 };
             NewSend(client, msg);
             sendDone.WaitOne();
-            
-            // Receive the response from the remote device.  
-            NewReceive(client);
-            receiveDone.WaitOne();
-
-            // Write the response to the Trace.
-            for (int i = 0; i < received.Length; i++)
-                Trace.WriteLine(received[i]);
         }
-
 
         public class StateObject
         {
