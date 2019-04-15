@@ -11,7 +11,7 @@ using WoodworkBerserk.Models;
 namespace WoodworkBerserk
 {
     [Synchronization]
-    class LocalGameServer : IGameServer
+    class LocalGameClient : IGameClient
     {
         private State state;
         private int playerId;

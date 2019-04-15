@@ -44,13 +44,13 @@
   <ItemGroup>
     <Compile Include="Controllers\AnimationController.cs" />
     <Compile Include="Controllers\IActionHandler.cs" />
-    <Compile Include="Controllers\LocalGameServer.cs" />
+    <Compile Include="Controllers\LocalGameClient.cs" />
     <Compile Include="Controllers\IKeyboardInputHandler.cs" />
     <Compile Include="Controllers\KeyboardInputHandler.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameMap.cs" />
-    <Compile Include="Controllers\GameServer.cs" />
-    <Compile Include="Controllers\IGameServer.cs" />
+    <Compile Include="Controllers\AsyncGameClient.cs" />
+    <Compile Include="Controllers\IGameClient.cs" />
     <Compile Include="Models\Animation.cs" />
     <Compile Include="Models\Entity.cs" />
     <Compile Include="Models\State.cs" />

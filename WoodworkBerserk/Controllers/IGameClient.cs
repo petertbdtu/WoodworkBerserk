@@ -4,7 +4,7 @@ using WoodworkBerserk.Models;
 
 namespace WoodworkBerserk
 {
-    interface IGameServer
+    interface IGameClient
     {
         void Connect(ContentManager content);
         void Disconnect();

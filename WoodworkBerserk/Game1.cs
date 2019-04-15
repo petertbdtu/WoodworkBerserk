@@ -13,7 +13,7 @@ namespace WoodworkBerserk
     /// </summary>
     public class Game1 : Game, IActionHandler
     {
-        IGameServer gameServer;
+        IGameClient gameServer;
         State state;
         Controllers.IKeyboardInputHandler kinput;
         Models.ISettings settings;
@@ -65,7 +65,7 @@ namespace WoodworkBerserk
         protected override void Initialize()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            gameServer = new LocalGameServer();
+            gameServer = new AsyncGameClient();
             gameServer.Connect(Content);
             state = gameServer.Receive();
             map = new GameMap(GraphicsDevice, Content, 16, 16);
