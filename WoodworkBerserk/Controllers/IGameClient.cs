@@ -6,9 +6,9 @@ namespace WoodworkBerserk
 {
     interface IGameClient
     {
-        void Connect(ContentManager content);
+        void Connect();
         void Disconnect();
-        void Send(PlayerAction action);
-        State Receive();
+        void SendAction(PlayerAction action);
+        State GetState();
     }
 }

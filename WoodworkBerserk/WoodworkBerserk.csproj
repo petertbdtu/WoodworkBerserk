@@ -42,6 +42,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Client\IServerMessageListener.cs" />
+    <Compile Include="Client\ServerMessageHandler.cs" />
+    <Compile Include="Client\WBClient.cs" />
     <Compile Include="Controllers\AnimationController.cs" />
     <Compile Include="Controllers\IActionHandler.cs" />
     <Compile Include="Controllers\LocalGameClient.cs" />
@@ -51,6 +54,8 @@
     <Compile Include="GameMap.cs" />
     <Compile Include="Controllers\AsyncGameClient.cs" />
     <Compile Include="Controllers\IGameClient.cs" />
+    <Compile Include="Message\ClientMessage.cs" />
+    <Compile Include="Message\ServerMessage.cs" />
     <Compile Include="Models\Animation.cs" />
     <Compile Include="Models\Entity.cs" />
     <Compile Include="Models\State.cs" />

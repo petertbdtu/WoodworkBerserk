@@ -32,26 +32,28 @@ namespace WoodworkBerserk
         
         public void MoveUp()
         {
-            gameServer.Send(PlayerAction.MoveUp);
+            gameServer.SendAction(PlayerAction.MoveUp);
         }
         public void MoveDown()
         {
-            gameServer.Send(PlayerAction.MoveDown);
+            gameServer.SendAction(PlayerAction.MoveDown);
         }
         public void MoveRight()
         {
-            gameServer.Send(PlayerAction.MoveRight);
+            gameServer.SendAction(PlayerAction.MoveRight);
         }
         public void MoveLeft()
         {
-            gameServer.Send(PlayerAction.MoveLeft);
+            gameServer.SendAction(PlayerAction.MoveLeft);
         }
         public void Interact()
         {
-            gameServer.Send(PlayerAction.Interact);
+            gameServer.SendAction(PlayerAction.Interact);
         }
         public void Shutdown()
         {
+            // TODO figure out why it's not exiting
+            // might fail on a Join() inside.
             gameServer.Disconnect();
             Exit();
         }
@@ -66,8 +68,8 @@ namespace WoodworkBerserk
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             gameServer = new AsyncGameClient();
-            gameServer.Connect(Content);
-            state = gameServer.Receive();
+            gameServer.Connect();
+            state = gameServer.GetState();
             map = new GameMap(GraphicsDevice, Content, 16, 16);
             kinput = new KeyboardInputHandler();
             settings = new DefaultSettings(this);
@@ -84,7 +86,7 @@ namespace WoodworkBerserk
         {
             // Create a new SpriteBatch, which can be used to draw textures
 
-            // TODO: use this.Content to load your game content here
+            // use this.Content to load your game content here
             //animationLeft = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 0);
             //animationUp = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 16);
             //animationDown = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 32);
@@ -105,7 +107,7 @@ namespace WoodworkBerserk
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+            // Unload any non ContentManager content here
         }
 
         public void Up(float elapsedTimeinSeconds)
@@ -120,19 +122,10 @@ namespace WoodworkBerserk
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // TODO: Add your update logic here
-
             var kstate = Keyboard.GetState();
             kinput.HandleInput(kstate);
 
-            /*
-             * HAVE TO SET UP CONNECTION ON STARTUP
-             * maintain connection?
-             * 
-             * Receive updated game state from server (incl. other user behavior)
-             *  May fail, will be received again later.
-             */
-            state = gameServer.Receive();
+            state = gameServer.GetState();
 
             //animationLeft.Update(gameTime);
             //animationUp.Update(gameTime);
@@ -147,8 +140,6 @@ namespace WoodworkBerserk
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.TransparentBlack);
-
-            // TODO: Add your drawing code here
             
             map.Draw(spriteBatch, state);
             spriteBatch.Begin();

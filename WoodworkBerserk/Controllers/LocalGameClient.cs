@@ -22,7 +22,7 @@ namespace WoodworkBerserk
         /**
          * Setup default state
          */
-        public void Connect(ContentManager content)
+        public void Connect()
         {
             /*
              * LocalGameServer only makes 1 entity, which is the player
@@ -53,7 +53,7 @@ namespace WoodworkBerserk
         /**
          * Retrieve current state
          */
-        public State Receive()
+        public State GetState()
         {
             return state;
         }
@@ -61,7 +61,7 @@ namespace WoodworkBerserk
         /**
          * Update state locally
          */
-        public void Send(PlayerAction action)
+        public void SendAction(PlayerAction action)
         {
             currentAction = action;
         }
@@ -90,7 +90,7 @@ namespace WoodworkBerserk
                     break;
             }
 
-            Send(PlayerAction.Nothing);
+            SendAction(PlayerAction.Nothing);
         }
     }
 }
