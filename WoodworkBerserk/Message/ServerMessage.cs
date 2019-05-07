@@ -17,59 +17,79 @@ namespace WoodworkBerserk.Message
             ServerMessage msg;
             switch (type)
             {
-                /*case ServerMessageType.Disconnect:
-                    msg = new ServerMessage();
+                case ServerMessageType.Disconnect:
+                    msg = new ServerMessageDisconnect(data);
                     break;
-                case ServerMessageType.Ping:
-                    msg = new ServerMessage();
+                case ServerMessageType.Update:
+                    msg = new ServerMessageUpdate(data);
                     break;
-                *//*case ServerMessageType.FullUpdate:
-                    msg = new ServerMessage();
-                    break;*/
-                /*case ServerMessageType.EntityUpdate:
-                    msg = new ServerMessage();
-                    break;*/
                 default:
-                    msg = new ServerMessageInvalid();
+                    msg = new ServerMessageInvalid(data);
                     break;
             }
 
             return msg;
         }
-        public static String ConvertToString(ServerMessage msg)
-        {
-            byte[] data = msg.Bytes();
-            StringBuilder sb = new StringBuilder();
-            sb.Append(msg.GetServerMessageType().ToString() + "{" + data[0]);
-            for (int i = 1; i < data.Length; i++)
-            {
-                sb.Append(", " + data[i]);
-            }
-            sb.Append("}");
-            return sb.ToString();
-        }
         abstract public ServerMessageType GetServerMessageType();
-        abstract public byte[] Bytes();
-        abstract public int NumBytes();
     }
     class ServerMessageInvalid : ServerMessage
     {
-        private byte[] data;
-        public ServerMessageInvalid()
-        {
-            data = new byte[] { (byte)ServerMessageType.Invalid };
-        }
+        public byte[] Data { get; }
+        public ServerMessageInvalid(byte[] data) { this.Data = data; }
         public override ServerMessageType GetServerMessageType()
         {
             return ServerMessageType.Invalid;
         }
-        public override byte[] Bytes()
+    }
+
+    class ServerMessageDisconnect : ServerMessage
+    {
+        public byte[] Data { get; }
+        public ServerMessageDisconnect(byte[] data) { this.Data = data; }
+        public override ServerMessageType GetServerMessageType()
         {
-            return data;
+            return ServerMessageType.Disconnect;
         }
-        public override int NumBytes()
+    }
+
+    class ServerMessageUpdate : ServerMessage
+    {
+        public int PlayerId { get; }
+        // TODO move map data to client
+        // int mapId { get; set } // replace map stuff below with this.
+        public int MapWidth { get; }
+        public int MapHeight { get; }
+        public int[] TerrainData { get; }
+        public int[] EntitiesData { get; }
+        public ServerMessageUpdate(byte[] data)
         {
-            return data.Length;
+            int pos = 0;
+            // data[0] is the type.
+            pos += 1;
+            PlayerId = BitConverter.ToInt32(data, pos);
+            pos += 4;
+            MapWidth = BitConverter.ToInt32(data, pos);
+            pos += 4;
+            MapHeight = BitConverter.ToInt32(data, pos);
+            pos += 4;
+            TerrainData = new int[MapWidth*MapHeight];
+            for (int i = 0; i < TerrainData.Length; i++)
+            {
+                TerrainData[i] = BitConverter.ToInt32(data, pos);
+                pos += 4;
+            }
+            // TODO carefully handle entity data
+            EntitiesData = new int[(data.Length - pos) / 4];
+            System.Diagnostics.Debug.WriteLine("entitiesdata length="+EntitiesData.Length);
+            for (int i = 0; i < EntitiesData.Length; i++)
+            {
+                EntitiesData[i] = BitConverter.ToInt32(data, pos);
+                pos += 4;
+            }
+        }
+        public override ServerMessageType GetServerMessageType()
+        {
+            return ServerMessageType.Update;
         }
     }
 }
