@@ -73,6 +73,7 @@ namespace WoodworkBerserk
             settings = new DefaultSettings(this);
             settings.SetupKeyboardInputHandler(kinput);
 
+
             base.Initialize();
         }
 

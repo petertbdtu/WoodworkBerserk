@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controllers\AnimationController.cs" />
+    <Compile Include="Controllers\DatabaseConnector.cs" />
     <Compile Include="Controllers\IActionHandler.cs" />
     <Compile Include="Controllers\LocalGameServer.cs" />
     <Compile Include="Controllers\IKeyboardInputHandler.cs" />
@@ -70,6 +71,9 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
