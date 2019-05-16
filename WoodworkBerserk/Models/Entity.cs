@@ -17,8 +17,14 @@ namespace WoodworkBerserk.Models
             this.position = position;
             this.textureId = textureId;
         }
-
-
-        
+        public Entity(int x, int y, int textureId)
+        {
+            this.position = new Vector2(x, y);
+            this.textureId = textureId;
+        }
+        public override string ToString()
+        {
+            return "{textureId="+textureId+", position="+position.ToString()+"}";
+        }
     }
 }

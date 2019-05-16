@@ -1,10 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace WoodworkBerserk.Models
 {
@@ -13,6 +7,7 @@ namespace WoodworkBerserk.Models
         public int mapWidth;
         public int mapHeight;
         public int mapID;
+        // TODO store maps locally, not in state.
         public int[,] terrain;
         public Dictionary<int, Entity> entities;
         public int playerId;
