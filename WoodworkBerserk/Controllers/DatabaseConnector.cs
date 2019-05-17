@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -11,25 +12,31 @@ namespace WoodworkBerserk.Controllers
     class DatabaseConnector
     {
 
-        SqlConnection connection;
+        NpgsqlConnection connection;
 
-        public DatabaseConnector(SqlConnection connection, String hostname, String databaseName, String userID, String userPassword)
+        public DatabaseConnector()
         {
-            this.connection = connection;
-            initializeDatabase(hostname, databaseName, userID, userPassword);
+            initializeDatabase();
             connect();
         }
 
-        public void initializeDatabase(String hostname, String databaseName, String userID, String userPassword)
+        public void initializeDatabase()
         {
-            string connectionString;
-            connectionString = @"Data Source=" + hostname + ";Initial Catalog=" + databaseName + ";User ID=" + userID + ";Password="+ userPassword;
-            connection = new SqlConnection(connectionString);
+            //SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            //builder.DataSource = "balarama.db.elephantsql.com,5432";
+            //builder.UserID = "onyyvcau";
+            //builder.Password = "uceLAbGSTVO4HyOLNczJinlQGWiKzVRR";
+            //builder.InitialCatalog = "woodworkberserk";
+            //string connectionString;
+            var connString = "Host=balarama.db.elephantsql.com;Username=onyyvcau;Password=uceLAbGSTVO4HyOLNczJinlQGWiKzVRR;Database=onyyvcau";
+            //connectionString = Properties.Settings.Default.Setting;
+            connection = new NpgsqlConnection(connString);
+            //connection = new SqlConnection(builder.ConnectionString);
             Console.WriteLine("Database initialized succesfully...");
         }
         public void connect()
         {
-            connection.Open();
+            connection.Open(); 
             Console.WriteLine("Database connected succesfully...");
         }
 
@@ -39,53 +46,66 @@ namespace WoodworkBerserk.Controllers
             Console.WriteLine("Database disconnected succesfully...");
         }
 
-        public bool Authenticate(String username, String password)
+        public int Authenticate(String username, String password)
         {
-            SqlCommand command;
-            SqlDataReader dataReader;
+            //NpgsqlCommand command;
+            //NpgsqlDataReader dataReader;
             String sql;
+           
 
-            sql = "SELECT COUNT(*) FROM player WHERE player_name='" + username + "' AND player_password='" + password + "'";
-            command = new SqlCommand(sql, connection);
-            bool result;
-            dataReader = command.ExecuteReader();
+            sql = "SELECT COUNT(*) FROM player WHERE player_name='" + username + "' AND player_password='" + password + "';";
+            using (var command = new NpgsqlCommand(sql, connection))
+            {
+                int result;
+                //dataReader = command.ExecuteReader();
+                object cmd = command.ExecuteScalar();
+                int cmd2 = int.Parse(string.Format("{0}", cmd));
+                Console.WriteLine(cmd);
+                if (cmd2 == 0)
+                {
+                    result = 1;
+                }
+                else
+                {
+                    result = 2;
+                }
 
-            if(Convert.ToInt32(dataReader.GetValue(0)) != 1)
-            {
-                result = false;
+                //dataReader.Close();
+                command.Dispose();
+                return result;
             }
-            else
-            {
-                result = true;
-            }
-            
-            dataReader.Close();
-            command.Dispose();
-            return result;
         }
-
+        //doesnt work? dunno why use auto_increment for player_id in SQL database
         public void createPlayer(String username, String password)
         {
-            SqlCommand command;
             String sql;
 
-            sql = "INSERT INTO player (player_id, player_name, player_password) VALUES (" + generateId() + ", '" + username + "', '" + password + "')";
-            command = new SqlCommand(sql, connection);
-            Console.WriteLine("Created player with username: " + username + ", and password: " + password);
-            command.Dispose();
+            sql = "INSERT INTO player (player_id, player_name, player_password) VALUES (@id, '@name', '@pass')";
+            using (var command = new NpgsqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@id", generateId());
+                command.Parameters.AddWithValue("@name", username);
+                command.Parameters.AddWithValue("@pass", password);
+                connection.Open();
+                command.ExecuteNonQuery();
+                Console.WriteLine("Created player with username: " + username + ", and password: " + password);
+                command.Dispose();
+            }
+            
         }
 
-        public uint generateId()
+        public int generateId()
         {
-            SqlCommand command;
-            SqlDataReader dataReader;
+            NpgsqlCommand command;
+            NpgsqlDataReader dataReader;
             String sql;
 
-            sql = "SELECT COUNT(*) FROM player";
-            command = new SqlCommand(sql, connection);
-            dataReader = command.ExecuteReader();
-            uint result = Convert.ToUInt32(dataReader.GetInt32(0));
-            dataReader.Close();
+            sql = "SELECT COUNT(*) FROM player;";
+            command = new NpgsqlCommand(sql, connection);
+            //dataReader = command.ExecuteReader();
+            object cmd = command.ExecuteScalar();
+            int result = int.Parse(string.Format("{0}", cmd));
+            //dataReader.Close();
             command.Dispose();
             return result + 1;
         }

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using WoodworkBerserk.Controllers;
 using WoodworkBerserk.Models;
 
@@ -22,6 +23,8 @@ namespace WoodworkBerserk
         SpriteBatch spriteBatch;
         Animation animationDown, animationUp, animationLeft;
         Texture2D character;
+        //DatabaseConnector db;
+        int count = 0;
 
         public Game1()
         {
@@ -72,7 +75,7 @@ namespace WoodworkBerserk
             kinput = new KeyboardInputHandler();
             settings = new DefaultSettings(this);
             settings.SetupKeyboardInputHandler(kinput);
-
+            //db = new DatabaseConnector();
 
             base.Initialize();
         }
@@ -97,6 +100,7 @@ namespace WoodworkBerserk
             //animationLeft.position = position;
             //animationUp.position = position;
             //animationDown.position = position;
+            
             character = Content.Load<Texture2D>("characters");
         }
 
@@ -106,6 +110,7 @@ namespace WoodworkBerserk
         /// </summary>
         protected override void UnloadContent()
         {
+            //db.disconnect();
             // TODO: Unload any non ContentManager content here
         }
 
@@ -134,9 +139,11 @@ namespace WoodworkBerserk
              *  May fail, will be received again later.
              */
             state = gameServer.Receive();
-
+            //db.createPlayer("12", "123456");
+            //Console.WriteLine(db.Authenticate("12", "123456"));
+            //Console.WriteLine(db.Authenticate("asfd","gfd"));
             //animationLeft.Update(gameTime);
-            //animationUp.Update(gameTime);
+            //animationUp.Update(gameTime);Herud
             //animationDown.Update(gameTime);
             base.Update(gameTime);
         }
