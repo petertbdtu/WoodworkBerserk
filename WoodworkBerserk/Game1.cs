@@ -141,7 +141,7 @@ namespace WoodworkBerserk
              * Receive updated game state from server (incl. other user behavior)
              *  May fail, will be received again later.
              */
-            state = gameServer.Receive();
+       
             //db.createPlayer("12", "123456");
             //Console.WriteLine(db.Authenticate("12", "123456"));
             //Console.WriteLine(db.Authenticate("asfd","gfd"));
