@@ -23,6 +23,8 @@ namespace WoodworkBerserk
         SpriteBatch spriteBatch;
         Animation animationDown, animationUp, animationLeft;
         Texture2D character;
+        //DatabaseConnector db;
+        int count = 0;
 
         public Game1()
         {
@@ -110,8 +112,11 @@ namespace WoodworkBerserk
         /// </summary>
         protected override void UnloadContent()
         {
+
             //db.disconnect();
             // TODO: Unload any non ContentManager content here
+
+            // Unload any non ContentManager content here
         }
 
         public void Up(float elapsedTimeinSeconds)
@@ -129,6 +134,17 @@ namespace WoodworkBerserk
             var kstate = Keyboard.GetState();
             kinput.HandleInput(kstate);
 
+            /*
+             * HAVE TO SET UP CONNECTION ON STARTUP
+             * maintain connection?
+             * 
+             * Receive updated game state from server (incl. other user behavior)
+             *  May fail, will be received again later.
+             */
+            state = gameServer.Receive();
+            //db.createPlayer("12", "123456");
+            //Console.WriteLine(db.Authenticate("12", "123456"));
+            //Console.WriteLine(db.Authenticate("asfd","gfd"));
             state = gameServer.GetState();
 
             //animationLeft.Update(gameTime);
