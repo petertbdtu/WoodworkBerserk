@@ -29,7 +29,7 @@ namespace WoodworkBerserk
         {
             client = new WBClient(server, PORT + 1, PORT);
             client.Connect(serverMessageHandler);
-            client.Send(new ClientMessageConnect());
+            client.Send(new ClientMessageConnect("aaaa", "zzz"));
 
             // Semi-busy wait for player ID from server. If lost it never continues
             // TODO implement login
@@ -47,14 +47,13 @@ namespace WoodworkBerserk
 
         public void Disconnect()
         {
-            client.Send(new ClientMessageDisconnect());
+            client.Send(new ClientMessageDisconnect(ownPlayerId));
             // TODO wait until confirmation
             client.StopListening();
         }
         
         public State GetState()
         {
-            System.Diagnostics.Debug.WriteLine("Getting state");
             // Prepare to accept new user input
             lastAction = PlayerAction.Nothing;
 
@@ -89,9 +88,7 @@ namespace WoodworkBerserk
                     {
                         Entity e;
                         entities.TryGetValue(k, out e);
-                        System.Diagnostics.Debug.WriteLine("k="+k+", e="+e.ToString());
                     }
-                    System.Diagnostics.Debug.WriteLine("Got new state");
                     newState = new State(0, terrain, entities, playerId);
 
                     // Prepare to accept new user input
@@ -109,8 +106,8 @@ namespace WoodworkBerserk
             {
                 lastAction = action;
 
-                ClientMessageCommand commandMessage = new ClientMessageCommand();
-                commandMessage.ConnectionId = ownPlayerId;
+                ClientMessageCommand commandMessage = new ClientMessageCommand(ownPlayerId);
+                commandMessage.AssumedPlayerId = ownPlayerId;
                 commandMessage.PlayerAction = action;
                 client.Send(commandMessage);
             }

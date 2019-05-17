@@ -28,7 +28,6 @@ namespace WoodworkBerserk.Client
             {
                 udpClient = new UdpClient(ownPort);
                 udpClient.Connect(server, otherPort);
-                Console.WriteLine("Connected");
                 this.listener = listener;
                 keepConnected = true;
                 t = new Thread(Receive);
@@ -37,7 +36,6 @@ namespace WoodworkBerserk.Client
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
             }
             return false;
         }
@@ -65,7 +63,7 @@ namespace WoodworkBerserk.Client
 
         public void Send(ClientMessage msg)
         {
-            udpClient.Send(msg.Bytes(), msg.NumBytes());
+            udpClient.Send(msg.Data, msg.Data.Length);
         }
     }
 }

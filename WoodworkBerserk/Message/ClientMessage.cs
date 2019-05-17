@@ -10,191 +10,110 @@ namespace WoodworkBerserk.Message
         Invalid = 0,
         Connect = 1,
         Disconnect = 2,
-        Pong = 3,
-        Command = 4
+        Command = 3
     }
     abstract class ClientMessage
     {
-        IPEndPoint origin;
-        public static ClientMessage Parse(byte[] data, IPEndPoint source)
-        {
-            ClientMessageType type = (ClientMessageType)Enum.ToObject(typeof(ClientMessageType), data[0]);
-            ClientMessage msg;
-            switch (type)
-            {
-                case ClientMessageType.Connect:
-                    msg = new ClientMessageConnect();
-                    break;
-                case ClientMessageType.Disconnect:
-                    msg = new ClientMessageDisconnect();
-                    break;
-                case ClientMessageType.Pong:
-                    msg = new ClientMessagePong();
-                    break;
-                case ClientMessageType.Command:
-                    if (data.Length == 9)
-                    {
-                        msg = new ClientMessageCommand();
-                        ((ClientMessageCommand)msg).ConnectionId = BitConverter.ToInt32(data, 1);
-                        ((ClientMessageCommand)msg).PlayerAction = (PlayerAction)BitConverter.ToInt32(data, 5);
-
-                    } else
-                    {
-                        msg = new ClientMessageInvalid();
-                    }
-                    break;
-                default:
-                    msg = new ClientMessageInvalid();
-                    break;
-            }
-
-            msg.SetOrigin(source);
-
-            return msg;
-        }
-
-        private static object PlayerAction(ClientMessageCommand msg)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static String ConvertToString(ClientMessage msg)
-        {
-            byte[] data = msg.Bytes();
-            StringBuilder sb = new StringBuilder();
-            sb.Append(msg.GetClientMessageType().ToString() + "{" + data[0]);
-            for (int i = 1; i < data.Length; i++)
-            {
-                sb.Append(", "+data[i]);
-            }
-            sb.Append("}");
-            return sb.ToString();
-        }
-        public void SetOrigin(IPEndPoint origin)
-        {
-            this.origin = origin;
-        }
-        public IPEndPoint GetOrigin()
-        {
-            return origin;
-        }
+        public byte[] Data { get; set; }
         abstract public ClientMessageType GetClientMessageType();
-        abstract public byte[] Bytes();
-        abstract public int NumBytes();
     }
     class ClientMessageInvalid : ClientMessage
     {
-        private byte[] data;
-        public ClientMessageInvalid()
+        public ClientMessageInvalid(int assumedPlayerId)
         {
-            data = new byte[] { (byte)ClientMessageType.Invalid };
+            Data = new byte[5];
+            Data[0] = (byte)ClientMessageType.Invalid;
+            byte[] apid = BitConverter.GetBytes(assumedPlayerId);
+            Data[1] = apid[0];
+            Data[2] = apid[1];
+            Data[3] = apid[2];
+            Data[4] = apid[3];
         }
         public override ClientMessageType GetClientMessageType()
         {
             return ClientMessageType.Invalid;
         }
-        public override byte[] Bytes()
-        {
-            return data;
-        }
-        public override int NumBytes()
-        {
-            return data.Length;
-        }
     }
     class ClientMessageConnect : ClientMessage
     {
-        private byte[] data;
-        public ClientMessageConnect()
+        public ClientMessageConnect(String username, String password)
         {
-            data = new byte[] { (byte)ClientMessageType.Connect };
+            int dataSize = 9 + username.Length + password.Length;
+            Data = new byte[dataSize];
+            Data[0] = (byte)ClientMessageType.Connect;
+            byte[] apid = BitConverter.GetBytes(-1);
+            Data[1] = apid[0];
+            Data[2] = apid[1];
+            Data[3] = apid[2];
+            Data[4] = apid[3];
+
+            int splitLoc = 9 + username.Length;
+            System.Diagnostics.Debug.WriteLine("splitLoc="+splitLoc);
+            byte[] splitLocBytes = BitConverter.GetBytes(splitLoc);
+            Data[5] = splitLocBytes[0];
+            Data[6] = splitLocBytes[1];
+            Data[7] = splitLocBytes[2];
+            Data[8] = splitLocBytes[3];
+
+            byte[] nameBytes = Encoding.ASCII.GetBytes(username);
+            for (int i = 0; i < username.Length; i++)
+            {
+                Data[9 + i] = nameBytes[i];
+            }
+            byte[] passBytes = Encoding.ASCII.GetBytes(password);
+            for (int i = 0; i < password.Length; i++)
+            {
+                Data[splitLoc + i] = passBytes[i];
+            }
         }
         public override ClientMessageType GetClientMessageType()
         {
             return ClientMessageType.Connect;
         }
-        public override byte[] Bytes()
-        {
-            return data;
-        }
-        public override int NumBytes()
-        {
-            return data.Length;
-        }
     }
     class ClientMessageDisconnect : ClientMessage
     {
-        private byte[] data;
-        public ClientMessageDisconnect()
+        public ClientMessageDisconnect(int assumedPlayerId)
         {
-            data = new byte[] { (byte)ClientMessageType.Disconnect };
+            Data = new byte[5];
+            Data[0] = (byte)ClientMessageType.Disconnect;
+            byte[] apid = BitConverter.GetBytes(assumedPlayerId);
+            Data[1] = apid[0];
+            Data[2] = apid[1];
+            Data[3] = apid[2];
+            Data[4] = apid[3];
         }
         public override ClientMessageType GetClientMessageType()
         {
             return ClientMessageType.Disconnect;
         }
-        public override byte[] Bytes()
-        {
-            return data;
-        }
-        public override int NumBytes()
-        {
-            return data.Length;
-        }
-    }
-    class ClientMessagePong : ClientMessage
-    {
-        private byte[] data;
-        public ClientMessagePong()
-        {
-            data = new byte[] { (byte)ClientMessageType.Pong };
-        }
-        public override ClientMessageType GetClientMessageType()
-        {
-            return ClientMessageType.Pong;
-        }
-        public override byte[] Bytes()
-        {
-            return data;
-        }
-        public override int NumBytes()
-        {
-            return data.Length;
-        }
     }
     class ClientMessageCommand : ClientMessage
     {
-        public int ConnectionId { get; set; }
+        public int AssumedPlayerId { get; set; }
         public PlayerAction PlayerAction { get; set; }
-        public ClientMessageCommand()
+        public ClientMessageCommand(int assumedPlayerId)
         {
+            AssumedPlayerId = assumedPlayerId;
+
+            Data = new byte[9];
+            Data[0] = (byte)ClientMessageType.Command;
+
+            byte[] idBytes = BitConverter.GetBytes(AssumedPlayerId);
+            Data[1] = idBytes[0];
+            Data[2] = idBytes[1];
+            Data[3] = idBytes[2];
+            Data[4] = idBytes[3];
+
+            byte[] actionBytes = BitConverter.GetBytes((int)PlayerAction);
+            Data[5] = actionBytes[0];
+            Data[6] = actionBytes[1];
+            Data[7] = actionBytes[2];
+            Data[8] = actionBytes[3];
         }
         public override ClientMessageType GetClientMessageType()
         {
             return ClientMessageType.Command;
-        }
-        public override byte[] Bytes()
-        {
-            byte[] data = new byte[9];
-            data[0] = (byte)ClientMessageType.Command;
-
-            byte[] idBytes = BitConverter.GetBytes(ConnectionId);
-            data[1] = idBytes[0];
-            data[2] = idBytes[1];
-            data[3] = idBytes[2];
-            data[4] = idBytes[3];
-
-            byte[] actionBytes = BitConverter.GetBytes((int)PlayerAction);
-            data[5] = actionBytes[0];
-            data[6] = actionBytes[1];
-            data[7] = actionBytes[2];
-            data[8] = actionBytes[3];
-
-            return data;
-        }
-        public override int NumBytes()
-        {
-            return 9;
         }
     }
 }

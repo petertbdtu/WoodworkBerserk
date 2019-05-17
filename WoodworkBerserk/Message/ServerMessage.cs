@@ -80,7 +80,6 @@ namespace WoodworkBerserk.Message
             }
             // TODO carefully handle entity data
             EntitiesData = new int[(data.Length - pos) / 4];
-            System.Diagnostics.Debug.WriteLine("entitiesdata length="+EntitiesData.Length);
             for (int i = 0; i < EntitiesData.Length; i++)
             {
                 EntitiesData[i] = BitConverter.ToInt32(data, pos);
