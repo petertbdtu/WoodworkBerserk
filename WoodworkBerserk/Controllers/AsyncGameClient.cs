@@ -97,6 +97,7 @@ namespace WoodworkBerserk
                 }
             }
 
+            oldState = newState;
             return newState;
         }
 
