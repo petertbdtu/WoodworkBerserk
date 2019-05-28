@@ -90,22 +90,18 @@ namespace WoodworkBerserk.Message
     }
     class ClientMessageCommand : ClientMessage
     {
-        public int AssumedPlayerId { get; set; }
-        public PlayerAction PlayerAction { get; set; }
-        public ClientMessageCommand(int assumedPlayerId)
+        public ClientMessageCommand(int assumedPlayerId, PlayerAction playerAction)
         {
-            AssumedPlayerId = assumedPlayerId;
-
             Data = new byte[9];
             Data[0] = (byte)ClientMessageType.Command;
 
-            byte[] idBytes = BitConverter.GetBytes(AssumedPlayerId);
+            byte[] idBytes = BitConverter.GetBytes(assumedPlayerId);
             Data[1] = idBytes[0];
             Data[2] = idBytes[1];
             Data[3] = idBytes[2];
             Data[4] = idBytes[3];
 
-            byte[] actionBytes = BitConverter.GetBytes((int)PlayerAction);
+            byte[] actionBytes = BitConverter.GetBytes((int)playerAction);
             Data[5] = actionBytes[0];
             Data[6] = actionBytes[1];
             Data[7] = actionBytes[2];

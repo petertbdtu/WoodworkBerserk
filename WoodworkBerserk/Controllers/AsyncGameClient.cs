@@ -4,6 +4,7 @@ using WoodworkBerserk.Controllers;
 using WoodworkBerserk.Models;
 using WoodworkBerserk.Client;
 using WoodworkBerserk.Message;
+using System;
 
 namespace WoodworkBerserk
 {
@@ -25,33 +26,32 @@ namespace WoodworkBerserk
             lastAction = PlayerAction.Nothing;
         }
 
-        public void Connect()
+        public bool Connect(string username, string password)
         {
             client = new WBClient(server, PORT + 1, PORT);
             client.Connect(serverMessageHandler);
-            client.Send(new ClientMessageConnect("aaaa", "zzz"));
+            client.Send(new ClientMessageConnect(username, password));
 
             // Semi-busy wait for player ID from server. If lost it never continues
-            // TODO implement login
-            /*while (ownPlayerId == -1)
+            bool receivedResponse = false;
+            bool gotId = false;
+            while (!receivedResponse)
             {
                 ServerMessage initMessage = serverMessageHandler.GetLatestServerMessage();
-                if (initMessage.GetServerMessageType() == ServerMessageAccepted)
+                if (initMessage != null)
                 {
-                    ownPlayerId = ((ServerMessageAccepted)initMessage).ConnectionId;
+                    receivedResponse = true;
+                    if (initMessage.GetServerMessageType() == ServerMessageType.Update)
+                    {
+                        ownPlayerId = ((ServerMessageUpdate)initMessage).PlayerId;
+                        // -1 means failed to log in.
+                        gotId = ownPlayerId != -1;
+                    }
+
                 }
                 System.Threading.Thread.Sleep(100);
-            }*/
-           // while(ownPlayerId == -1)
-           // {
-           //     ServerMessage initMessage = serverMessageHandler.GetLatestServerMessage();
-           //     if(initMessage.GetServerMessageType() == ServerMessageType.Accepted)
-           //     {
-                    //ownPlayerId = ((ServerMessageAccepted)initMessage).ConnectionId;
-          //      }
-          //      System.Threading.Thread.Sleep(100);
-          //  }
-            ownPlayerId = 0;
+            }
+            return gotId;
         }
 
         public void Disconnect()
@@ -116,9 +116,7 @@ namespace WoodworkBerserk
             {
                 lastAction = action;
 
-                ClientMessageCommand commandMessage = new ClientMessageCommand(ownPlayerId);
-                commandMessage.AssumedPlayerId = ownPlayerId;
-                commandMessage.PlayerAction = action;
+                ClientMessageCommand commandMessage = new ClientMessageCommand(ownPlayerId, lastAction);
                 client.Send(commandMessage);
             }
         }

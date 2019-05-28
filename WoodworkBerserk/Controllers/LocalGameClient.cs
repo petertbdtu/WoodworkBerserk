@@ -22,7 +22,7 @@ namespace WoodworkBerserk
         /**
          * Setup default state
          */
-        public void Connect()
+        public bool Connect(string username, string password)
         {
             /*
              * LocalGameServer only makes 1 entity, which is the player
@@ -43,6 +43,8 @@ namespace WoodworkBerserk
             entities.Add(playerId, new Entity(new Vector2(5, 5), 1));
             entities.Add(1, new Entity(new Vector2(1, 1), 1));
             state = new State(0, terrain, entities, playerId);
+
+            return true;
         }
 
         public void Disconnect()
