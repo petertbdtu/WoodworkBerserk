@@ -47,8 +47,8 @@ namespace WoodworkBerserk.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=balarama.db.elephantsql.com;Initial Catalog=onyyvcau;Integrated Secur" +
-            "ity True;User ID=onyyvcau;Password=uceLAbGSTVO4HyOLNczJinlQGWiKzVRR;")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=balarama.db.elephantsql.com;Initial Catalog=onyyvcau;User ID=onyyvcau" +
+            ";Password=uceLAbGSTVO4HyOLNczJinlQGWiKzVRR;Integrated Security True")]
         public string Setting {
             get {
                 return ((string)(this["Setting"]));

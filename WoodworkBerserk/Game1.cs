@@ -4,7 +4,11 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using WoodworkBerserk.Client;
 using WoodworkBerserk.Controllers;
+using WoodworkBerserk.Message;
 using WoodworkBerserk.Models;
 
 namespace WoodworkBerserk
@@ -15,6 +19,7 @@ namespace WoodworkBerserk
     public class Game1 : Game, IActionHandler
     {
         IGameClient gameServer;
+        WBClient gameClient;
         State state;
         Controllers.IKeyboardInputHandler kinput;
         Models.ISettings settings;
@@ -23,14 +28,24 @@ namespace WoodworkBerserk
         SpriteBatch spriteBatch;
         Animation animationDown, animationUp, animationLeft;
         Texture2D character;
-        //DatabaseConnector db;
+        DatabaseConnector db;
         int count = 0;
+        enum GameState
+        {
+            Menu,
+            Game
+        }
+
+        bool loggedIn = false;
+        string text = "";
+        GameState gameState;
+        private SpriteFont font;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
+            gameState = GameState.Menu;
         }
         
         public void MoveUp()
@@ -77,7 +92,8 @@ namespace WoodworkBerserk
             kinput = new KeyboardInputHandler();
             settings = new DefaultSettings(this);
             settings.SetupKeyboardInputHandler(kinput);
-            //db = new DatabaseConnector();
+            db = new DatabaseConnector();
+ 
 
             base.Initialize();
         }
@@ -91,18 +107,18 @@ namespace WoodworkBerserk
             // Create a new SpriteBatch, which can be used to draw textures
 
             // use this.Content to load your game content here
-            //animationLeft = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 0);
+            //animationLeft = new Animation(Content.Load<Texture2D>("characters"), 3, 4, 0);
             //animationUp = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 16);
             //animationDown = new Animation(Content.Load<Texture2D>("hero"), 3, 4, 32);
             //animationLeft.updateTime = 1f / 5;
             //animationUp.updateTime = 1f / 5;
             //animationDown.updateTime = 1f / 5;
-            //Vector2 position = new Vector2(graphics.PreferredBackBufferWidth / 2,
-            //    graphics.PreferredBackBufferHeight / 2);
+            Vector2 position = new Vector2(graphics.PreferredBackBufferWidth / 2,
+                graphics.PreferredBackBufferHeight / 2);
             //animationLeft.position = position;
             //animationUp.position = position;
             //animationDown.position = position;
-            
+            font = Content.Load<SpriteFont>("file");
             character = Content.Load<Texture2D>("characters");
         }
 
@@ -131,25 +147,47 @@ namespace WoodworkBerserk
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            var kstate = Keyboard.GetState();
-            kinput.HandleInput(kstate);
+            if (gameState == GameState.Menu)
+            {
+                //code for menu
+                var kstate = Keyboard.GetState();
+                KeyboardInputHandler handler = new KeyboardInputHandler();
+                handler.HandleInput(kstate);
+                text += kstate.GetPressedKeys();
+                
+                if(loggedIn) //update loggedIn to true on succesfull login
+                {
+                    gameState = GameState.Game;
+                    
+                }
+            }
+            else
+            {
+                var kstate = Keyboard.GetState();
+                kinput.HandleInput(kstate);
 
-            /*
-             * HAVE TO SET UP CONNECTION ON STARTUP
-             * maintain connection?
-             * 
-             * Receive updated game state from server (incl. other user behavior)
-             *  May fail, will be received again later.
-             */
-       
-            //db.createPlayer("12", "123456");
-            //Console.WriteLine(db.Authenticate("12", "123456"));
-            //Console.WriteLine(db.Authenticate("asfd","gfd"));
-            state = gameServer.GetState();
+                /*
+                 * HAVE TO SET UP CONNECTION ON STARTUP
+                 * maintain connection?
+                 * 
+                 * Receive updated game state from server (incl. other user behavior)
+                 *  May fail, will be received again later.
+                 */
+                 if (count == 0)
+                {
+                    db.updatePlayer_active(2, true);
+                    Console.WriteLine(db.getPlayer_active("1", "1"));
+                    //db.createPlayer("asd", "asd");
+                    //Console.WriteLine(db.Authenticate("asd", "asd"));
+                    count++;
+                }
+                //Console.WriteLine(db.Authenticate("asfd","gfd"));
+                state = gameServer.GetState();
 
-            //animationLeft.Update(gameTime);
-            //animationUp.Update(gameTime);Herud
-            //animationDown.Update(gameTime);
+                //animationLeft.Update(gameTime);
+                //animationUp.Update(gameTime);Herud
+                //animationDown.Update(gameTime);
+            }
             base.Update(gameTime);
         }
 
@@ -160,18 +198,46 @@ namespace WoodworkBerserk
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.TransparentBlack);
+            if (gameState == GameState.Menu)
+            {
+                int switcher = 0;
+                spriteBatch.Begin();
+                if(switcher == 0)
+                spriteBatch.DrawString(font, "Enter username", new Vector2(100, 100), Color.White);
+                //make readline async
+                string username = Console.ReadLine();
+                Console.WriteLine(username);
+                if (username == "123")
+                {
+                    switcher++;
+                    spriteBatch.DrawString(font, "Enter password", new Vector2(100, 200), Color.White);
+                    //make readline async
+
+                    string password = Console.ReadLine();
+                    if (password == "321")
+                    {   
+                        gameState = GameState.Game;
+                        ClientMessage message = new ClientMessageConnect(username, password);
+                        //gameClient.Send(message);
+                    }
+                }
+                spriteBatch.End();
+            } else
+            {
+
             
-            map.Draw(spriteBatch, state);
+                map.Draw(spriteBatch, state);
             spriteBatch.Begin();
             //animationLeft.loop = false;
             //animationLeft.Draw(spriteBatch);
             //spriteBatch.Draw(ballTexture, ballPosition, null, Color.White, 0f,
             //    new Vector2(ballTexture.Width / 2, ballTexture.Height / 2),
             //    Vector2.One, SpriteEffects.None, 0f );
-            spriteBatch.Draw(character, Vector2.Zero, null, new Rectangle(Point.Zero, new Point(16, 16)), null, 0f, null, Color.White, SpriteEffects.None, 0.1f);
+            spriteBatch.Draw(character, new Vector2(graphics.PreferredBackBufferWidth/2, graphics.PreferredBackBufferHeight/2), null, new Rectangle(Point.Zero, new Point(16, 16)), null, 0f, null, Color.White, SpriteEffects.None, 0.1f);
             
             spriteBatch.End();
             base.Draw(gameTime);
+            }
         }
     }
 }

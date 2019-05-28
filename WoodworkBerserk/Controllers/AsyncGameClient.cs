@@ -42,6 +42,15 @@ namespace WoodworkBerserk
                 }
                 System.Threading.Thread.Sleep(100);
             }*/
+           // while(ownPlayerId == -1)
+           // {
+           //     ServerMessage initMessage = serverMessageHandler.GetLatestServerMessage();
+           //     if(initMessage.GetServerMessageType() == ServerMessageType.Accepted)
+           //     {
+                    //ownPlayerId = ((ServerMessageAccepted)initMessage).ConnectionId;
+          //      }
+          //      System.Threading.Thread.Sleep(100);
+          //  }
             ownPlayerId = 0;
         }
 

@@ -36,7 +36,6 @@ namespace WoodworkBerserk.Controllers
         }
         public void connect()
         {
-            connection.Open(); 
             Console.WriteLine("Database connected succesfully...");
         }
 
@@ -46,32 +45,34 @@ namespace WoodworkBerserk.Controllers
             Console.WriteLine("Database disconnected succesfully...");
         }
 
-        public int Authenticate(String username, String password)
+        public bool Authenticate(String username, String password)
         {
             //NpgsqlCommand command;
             //NpgsqlDataReader dataReader;
             String sql;
-           
+
 
             sql = "SELECT COUNT(*) FROM player WHERE player_name='" + username + "' AND player_password='" + password + "';";
             using (var command = new NpgsqlCommand(sql, connection))
             {
-                int result;
+                bool result;
                 //dataReader = command.ExecuteReader();
+                connection.Open();
                 object cmd = command.ExecuteScalar();
                 int cmd2 = int.Parse(string.Format("{0}", cmd));
                 Console.WriteLine(cmd);
                 if (cmd2 == 0)
                 {
-                    result = 1;
+                    result = false;
                 }
                 else
                 {
-                    result = 2;
+                    result = true;
                 }
 
                 //dataReader.Close();
                 command.Dispose();
+                disconnect();
                 return result;
             }
         }
@@ -79,19 +80,26 @@ namespace WoodworkBerserk.Controllers
         public void createPlayer(String username, String password)
         {
             String sql;
-
-            sql = "INSERT INTO player (player_id, player_name, player_password) VALUES (@id, '@name', '@pass')";
+            sql = "INSERT INTO player (player_name, player_password, player_position_x, player_position_y, player_active) VALUES (@name, @pass, 50, 50, false)";
             using (var command = new NpgsqlCommand(sql, connection))
             {
-                command.Parameters.AddWithValue("@id", generateId());
                 command.Parameters.AddWithValue("@name", username);
                 command.Parameters.AddWithValue("@pass", password);
                 connection.Open();
-                command.ExecuteNonQuery();
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
+
                 Console.WriteLine("Created player with username: " + username + ", and password: " + password);
                 command.Dispose();
+                disconnect();
             }
-            
+
         }
 
         public int generateId()
@@ -103,13 +111,75 @@ namespace WoodworkBerserk.Controllers
             sql = "SELECT COUNT(*) FROM player;";
             command = new NpgsqlCommand(sql, connection);
             //dataReader = command.ExecuteReader();
+            connection.Open();
             object cmd = command.ExecuteScalar();
             int result = int.Parse(string.Format("{0}", cmd));
             //dataReader.Close();
             command.Dispose();
+            disconnect();
             return result + 1;
         }
 
+        public int getPlayer_Id(string username, string password)
+        {
+            NpgsqlCommand command;
+            NpgsqlDataReader dataReader;
+            string sql;
+            int result = new int();
+            sql = "SELECT player_id FROM player WHERE player_name = @name AND player_password = @pass ";
+            using (var cmd = new NpgsqlCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@name", username);
+                cmd.Parameters.AddWithValue("@pass", password);
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+                if (dataReader.Read())
+                {
+                    result = (int)dataReader.GetInt32(0);
+                }
+                dataReader.Close();
+                cmd.Dispose();
+            }
+            connection.Close();
+            return result;
+        }
 
+        public bool getPlayer_active(string username, string password)
+        {
+            NpgsqlDataReader dataReader;
+            string sql;
+            bool result = new bool();
+            sql = "SELECT player_active FROM player WHERE player_name = @name AND player_password = @pass ";
+            using (var cmd = new NpgsqlCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@name", username);
+                cmd.Parameters.AddWithValue("@pass", password);
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+                if (dataReader.Read())
+                {
+                    result = (bool)dataReader.GetBoolean(0);
+                }
+                dataReader.Close();
+                cmd.Dispose();
+            }
+            connection.Close();
+            return result;
+        }
+
+        public void updatePlayer_active(int player_id, bool player_active)
+        {
+            string sql;
+            sql = "UPDATE player SET player_active = @active WHERE player_id = @id;";
+            using (var cmd = new NpgsqlCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@id", player_id);
+                cmd.Parameters.AddWithValue("@active", player_active);
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                cmd.Dispose();
+            }
+            connection.Close();
+        }
     }
 }
